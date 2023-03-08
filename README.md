@@ -108,3 +108,32 @@ collection.update_one({}, data)
   "data": ["2021", "2022"]
 }
 ```
+
+## Pymongo의 결과물을 for문 돌면서 key - value 할당해 json 리턴
+```
+import pymongo
+import json
+
+# MongoDB와 연결
+client = pymongo.MongoClient("mongodb://localhost:27017/")
+db = client["mydatabase"]
+collection = db["mycollection"]
+
+# MongoDB에서 데이터 가져오기
+results = collection.find()
+
+# Python 리스트에 데이터 저장
+data = []
+for result in results:
+    data.append(result)
+
+# Python 객체에 새로운 key-value 쌍 추가
+for d in data:
+    d["new_key"] = "new_value"
+
+# Python 객체를 json으로 직렬화
+json_results = json.dumps(data)
+
+# 결과 출력
+print(json_results)
+```
