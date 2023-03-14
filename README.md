@@ -141,7 +141,6 @@ print(json_results)
 ## Mongodb에서 embedded document 업데이트 할 때 dot notation을 이용한 부분 업데이트 처리
 ```
 //mongodb 스키마에 아래와 같은 embedded document 가 있다고 가정
-
 payment {
  success: null,
  error: null,
