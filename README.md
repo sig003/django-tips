@@ -137,3 +137,38 @@ json_results = json.dumps(data)
 # 결과 출력
 print(json_results)
 ```
+
+## Mongodb에서 embedded document 업데이트 할 때 dot notation을 이용한 부분 업데이트 처리
+```
+//mongodb 스키마에 아래와 같은 embedded document 가 있다고 가정
+
+payment {
+ success: null,
+ error: null,
+}
+
+//쿼리 조건문
+condition = {
+ 'key': 'abcd'
+}
+
+//아래과 같이 업데이트 해 버리면 정의하지 않은 다른 컬럼은 없어짐 (error 컬럼 날아감)
+//아래에 정의한 컬럼으로 바꿔치기 해 버림
+data = {
+ '$set': {
+  'payment': {
+   'success': 'ok'
+  }
+ }
+}
+
+//아래와 같이 하면 정의한 컬럼만 업데이트 침
+//dot notation
+data = {
+ '$set': {
+  'payment.success': 'ok'
+ }
+}
+
+db.update_one(condition, data)
+```
