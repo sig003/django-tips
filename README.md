@@ -1,10 +1,9 @@
 # django-tips
 
 ## API Http Response 공통 함수화
+### 기존 소스
 
 ```
-#기존 소스
-
 #Test/app/views.py
 
 from rest_framework.views import APIView
@@ -28,9 +27,8 @@ class SomeView(APIView):
           return HttpResponse(json.dumps({'status': 'F'}, default=json_util.default, ensure_ascii=False), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 ```
 
+###변경 소스
 ```
-#변경 소스
-
 #Test/utils.py
 
 from rest_framework import status
