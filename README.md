@@ -2,10 +2,11 @@
 
 ## API Http Response 공통 함수화
 
+```
 #기존 소스
 
 #Test/app/views.py
-```
+
 from rest_framework.views import APIView
 from rest_framework import status
 from bson import json_util
