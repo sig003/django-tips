@@ -1,5 +1,85 @@
 # django-tips
 
+## API Http Response 공통 함수화
+
+#기존 소스
+
+#Test/app/views.py
+```
+from rest_framework.views import APIView
+from rest_framework import status
+from bson import json_util
+import json
+from django.http import HttpResponse
+
+class SomeView(APIView):
+  def get(self, request):  
+    try:
+        serializer = SomeSerializer()
+        if serializer.is_valid():
+    
+          #logic
+          ...
+
+           return HttpResponse(json.dumps({'status': 'S', 'data': result}, default=json_util.default, ensure_ascii=False), status=status.HTTP_200_OK)
+         return HttpResponse(json.dumps({'status': 'F', 'data': 'Bad Request'}, default=json_util.default, ensure_ascii=False), status=status.HTTP_400_BAD_REQUEST)
+    except:
+          return HttpResponse(json.dumps({'status': 'F'}, default=json_util.default, ensure_ascii=False), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+```
+
+```
+#변경 소스
+
+#Test/utils.py
+
+from rest_framework import status
+from bson import json_util
+import json
+from django.http import HttpResponse
+
+def generateHttpResponse(statusCode, data=None):
+    if statusCode == 200:
+        statusResult = 'S'
+    elif statusCode == 201:
+        statusResult = 'S'
+    elif statusCode == 400:
+        statusResult = 'F'
+        data = 'Bad Request'
+    else:
+        statusResult = 'F'
+        data = 'Internal Server Error'
+
+    return HttpResponse(
+            json.dumps(
+                {
+                    'status': statusResult,
+                    'data': data
+                },
+                default=json_util.default,
+                ensure_ascii=False),
+            status=statusCode
+
+
+#Test/app/views.py
+
+from rest_framework.views import APIView
+from Test.utils import generateHttpResponse
+
+class SomeView(APIView):
+  def get(self, request):  
+    try:
+        serializer = SomeSerializer()
+        if serializer.is_valid():
+    
+          #logic
+          ...
+
+          return generateHttpResponse(200, result)
+        return generateHttpResponse(400)
+    except:
+        return generateHttpResponse(500)
+```
+   
 ## apscheudler를 이용한 스케쥴러 등록
 ```
 //참조: https://dev.to/brightside/scheduling-tasks-using-apscheduler-in-django-2dbl
