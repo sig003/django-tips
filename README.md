@@ -20,7 +20,7 @@ token: ttttt
 revoked: null
 ```
 
-## 2) access_token 만료 후 refresh_token으로 1회 갱신
+### 2) access_token 만료 후 refresh_token으로 1회 갱신
 ```
 oauth2_provider_accesstoken
 
