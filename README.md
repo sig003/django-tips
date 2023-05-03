@@ -1,7 +1,7 @@
 # django-tips
 
-# Django-Oauth-Toolkit access_token, refresh_token 생성 순서
-### 최초 토큰 발급
+## Django-Oauth-Toolkit access_token, refresh_token 생성 순서
+### 1) 최초 토큰 발급
 ```
 oauth2_provider_accesstoken
 
@@ -20,7 +20,7 @@ token: ttttt
 revoked: null
 ```
 
-## access_token 만료 후 refresh_token으로 1회 갱신
+## 2) access_token 만료 후 refresh_token으로 1회 갱신
 ```
 oauth2_provider_accesstoken
 
@@ -51,7 +51,7 @@ token: ttttt
 revoked: 2023-04-01T00:00:000
 ```
 
-### access_token 만료 후 refresh_token으로 2회 갱신
+### 3) access_token 만료 후 refresh_token으로 2회 갱신
 ```
 oauth2_provider_accesstoken
 
