@@ -1,5 +1,92 @@
 # django-tips
 
+# Django-Oauth-Toolkit access_token, refresh_token 생성 순서
+### 최초 토큰 발급
+```
+oauth2_provider_accesstoken
+
+# 생성
+id: 100
+source_refresh_token: null
+token: aaaaa
+```
+```
+oauth2_provider_refreshtoken
+
+# 생성
+id: 200
+access_token_id: 100
+token: ttttt
+revoked: null
+```
+
+## access_token 만료 후 refresh_token으로 1회 갱신
+```
+oauth2_provider_accesstoken
+
+# 생성
+id: 101
+source_refresh_token: 200
+token: bbbbb
+
+# 삭제
+id: 100
+source_refresh_token: null
+token: aaaaa
+```
+```
+oauth2_provider_refreshtoken
+
+# 생성
+id: 201
+access_token_id: 101
+token: uuuuu
+revoked: null
+
+
+# 취소로 업데이트
+id: 200
+access_token_id: null
+token: ttttt
+revoked: 2023-04-01T00:00:000
+```
+
+### access_token 만료 후 refresh_token으로 2회 갱신
+```
+oauth2_provider_accesstoken
+
+# 생성
+id: 102
+source_refresh_token: 201
+token: ccccc
+
+# 삭제
+id: 101
+source_refresh_token: 200
+token: bbbbb
+```
+```
+oauth2_provider_refreshtoken
+
+# 생성
+id: 202
+access_token_id: 102
+token: vvvvv
+revoked: null
+
+# 취소로 업데이트
+id: 201
+access_token_id: null
+token: uuuuu
+revoked: 2023-04-01T00:00:000
+
+# 기존에 취소로 업데이트되어 있음
+id: 200
+access_token_id: null
+token: ttttt
+revoked: 2023-04-01T00:00:000
+```
+
 ## API Http Response 공통 함수화
 ### 기존 소스
 
