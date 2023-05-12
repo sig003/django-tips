@@ -10,10 +10,11 @@ urlpatterns = [
     ...
 ]
 
+
+# MyApp/customtoken.py
 # 아래 파일을 생성
 # Django-Oauth-Toolkit의 token 생서 로직 복사
 # 원하는 위치에 커스텀 로직 삽입해 기존 로직 overriding 처리
-# MyApp/customtoken.py
 
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
