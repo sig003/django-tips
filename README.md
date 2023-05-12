@@ -1,4 +1,59 @@
 # django-tips
+## Django-Oauth-Toolkit Custom Overriding
+```
+# MyApp/urls.py
+from .customtoken import CustomTokenView
+
+urlpatterns = [
+    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path('o/customtoken/', CustomTokenView.as_view(), name='oauth2_provider_custom_token'), # 커스텀 url 추가
+    ...
+]
+
+# 아래 파일을 생성
+# Django-Oauth-Toolkit의 token 생서 로직 복사
+# 원하는 위치에 커스텀 로직 삽입해 기존 로직 overriding 처리
+# MyApp/customtoken.py
+
+from django.http import HttpResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.debug import sensitive_post_parameters
+from oauth2_provider.models import get_access_token_model
+from oauth2_provider.signals import app_authorized
+import json
+from django.views.decorators.csrf import csrf_exempt
+from oauth2_provider.views.base import TokenView
+
+@method_decorator(csrf_exempt, name="dispatch")
+class CustomTokenView(TokenView):
+    """
+    Implements an endpoint to provide access tokens
+
+    The endpoint is used in the following flows:
+    * Authorization code
+    * Password
+    * Client credentials
+    """
+
+    @method_decorator(sensitive_post_parameters("password"))
+    def post(self, request, *args, **kwargs):
+        url, headers, body, status = self.create_token_response(request)
+        if status == 200:
+            access_token = json.loads(body).get("access_token")
+            if access_token is not None:
+                token = get_access_token_model().objects.get(token=access_token)
+                app_authorized.send(sender=self, request=request, token=token)
+        response = HttpResponse(content=body, status=status)
+        
+        for k, v in headers.items():
+            response[k] = v
+        return response
+
+
+# http request
+curl -X POST -d "grant_type=password&username=<user_name>&password=<password>" -u"<client_id>:<client_secret>" http://localhost:8000/o/customtoken/
+
+```
 
 ## Django-Oauth-Toolkit access_token, refresh_token 생성 순서
 ### 1) 최초 토큰 발급
