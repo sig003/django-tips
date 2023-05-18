@@ -2,6 +2,7 @@
 ## 고차 함수로 try/except 공통화해서 코드 간결화하기
 ```
 from utils.py import makeTryExcept 
+
 class SomeClass(APIView):
 
  def post(self, request):
