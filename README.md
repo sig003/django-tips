@@ -1,4 +1,32 @@
 # django-tips
+## 고차 함수로 try/except 공통화해서 코드 간결화하기
+```
+from utils.py import makeTryExcept 
+class SomeClass(APIView):
+
+ def post(self, request):
+        return makeTryExcept(lambda: self.mainLogic(request))
+
+    def mainLogic(self, request):
+      ...
+      # Main Logic
+      ...
+
+
+# utils.py
+
+def makeTryExcept(mainLogicFunction):
+    try:
+        return mainLogicFunction()
+    except Exception as e:
+        return HttpResponse(
+                      json.dumps({'status': 500, 'result': str(e)},
+                      default=json_util.default,                
+                      ensure_ascii=False),
+                      status=500
+                  )
+```
+
 ## Django-Oauth-Toolkit Custom Overriding
 ```
 # MyApp/urls.py
