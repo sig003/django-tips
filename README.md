@@ -69,7 +69,7 @@ hash: 8mDMMPX3i1H2gYb5Emo5vDfF6PKPj18/3YtoDFN6afE=
 ### 설명
 - $를 기준으로 값을 구분함
 - hash 값은 암호화 된 값을 base64 인코딩한 값
-- iterations 은 알고리즘을 반복하는 횟수
+- iterations 은 알고리즘을 반복하는 횟수로 django 버전에 따라 다를 수 있음
 - 패스워드 값은 hash 값이라 복호화를 할 수 없음
 - plaintext로 hash 값을 생성하면 항상 동일한 결과값을 얻을 수 있지만 salt 값 때문에 동일한 결과값을 얻을 수 없음
 - salt 값은 랜덤하게 바뀌는 값이므로 같은 plaintext 값을 넣어도 똑같은 암호화 값을 얻을 수 없음
