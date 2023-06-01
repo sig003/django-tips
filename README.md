@@ -1,4 +1,85 @@
 # django-tips
+
+## Django 패스워드(PBKDF2PasswordHasher) 생성 로직
+### 패스워드 생성
+```
+1. 패스워드 입력
+password:abcd
+
+
+2. 알고리즘으로 hash 생성
+password: abcd
+salt(random value): pB7aJgypDGpGR837yNcGmb
+iteration: 100000
+digest: sha256
+
+결과 => hash: 8mDMMPX3i1H2gYb5Emo5vDfF6PKPj18/3YtoDFN6afE=
+
+
+3. 생성한 hash와 알고리즘을 조합해 최종 패스워드 생성
+algorithm: pbkdf2_sha256
+iteration: 100000
+salt: pB7aJgypDGpGR837yNcGmb
+hash: 8mDMMPX3i1H2gYb5Emo5vDfF6PKPj18/3YtoDFN6afE=
+
+결과 => 최종 패스워드: pbkdf2_sha256$100000$pB7aJgypDGpGR837yNcGmb$8mDMMPX3i1H2gYb5Emo5vDfF6PKPj18/3YtoDFN6afE=
+```
+
+### 패스워드 비교
+```
+1. 기존 패스워드에서 알고리즘 추출
+기존 패스워드: pbkdf2_sha256$100000$pB7aJgypDGpGR837yNcGmb$8mDMMPX3i1H2gYb5Emo5vDfF6PKPj18/3YtoDFN6afE=
+
+결과 => 
+algorithm: pbkdf2_sha256
+iteration: 100000
+salt: pB7aJgypDGpGR837yNcGmb
+
+
+2. 비교할 패스워드 입력
+password: abcd
+
+
+3. 기존 패스워드에서 추출한 알고리즘으로 입력한 패스워드의 hash 생성
+password: abcd
+salt(random value): pB7aJgypDGpGR837yNcGmb
+iteration: 100000
+digest: sha256
+
+결과 => hash: 8mDMMPX3i1H2gYb5Emo5vDfF6PKPj18/3YtoDFN6afE=
+
+
+4. 생성한 hash와 알고리즘을 조합해 최종 패스워드 생성
+algorithm: pbkdf2_sha256
+iteration: 100000
+salt: pB7aJgypDGpGR837yNcGmb
+hash: 8mDMMPX3i1H2gYb5Emo5vDfF6PKPj18/3YtoDFN6afE=
+
+결과 => 최종 패스워드: pbkdf2_sha256$100000$pB7aJgypDGpGR837yNcGmb$8mDMMPX3i1H2gYb5Emo5vDfF6PKPj18/3YtoDFN6afE=
+
+
+5. 기존 패스워드와 입력한 패스워드의 최종 패스워드 값으로 비교 실행
+기존 패스워드: pbkdf2_sha256$100000$pB7aJgypDGpGR837yNcGmb$8mDMMPX3i1H2gYb5Emo5vDfF6PKPj18/3YtoDFN6afE=
+
+==
+
+입력 패스워드: pbkdf2_sha256$100000$pB7aJgypDGpGR837yNcGmb$8mDMMPX3i1H2gYb5Emo5vDfF6PKPj18/3YtoDFN6afE=
+```
+
+### 설명
+- $를 기준으로 값을 구분함
+- hash 값은 암호화 된 값을 base64 인코딩한 값
+- iterations 은 알고리즘을 반복하는 횟수
+- 패스워드 값은 hash 값이라 복호화를 할 수 없음
+- plaintext로 hash 값을 생성하면 항상 동일한 결과값을 얻을 수 있지만 salt 값 때문에 동일한 결과값을 얻을 수 없음
+- salt 값은 랜덤하게 바뀌는 값이므로 같은 plaintext 값을 넣어도 똑같은 암호화 값을 얻을 수 없음
+- 암호화 된 값을 복호화 할 수 없으므로 동일한 알고리즘으로 plaintext 값을 암호화하고 이 값으로 기존에 생성된 암호화 값과 비교해야 함
+- 동일한 알고리즘으로 재암호 할 수 있게 하려고 algorithm, iterations, salt 값을 패스워드 자체에 붙여 놓는 것임
+- plaintext로 동일한 암호화 값이 얻어지지 않아서 문제라고 생각하면 안 됨
+- 그렇게 만드려면 salt 값을 고정시키면 되지만 항상 동일한 hash 값이 만들어지므로 보안에 취약해짐
+- salt는 동일한 값이 안 나오게 하기 위한 장치임
+- 패스워드 탈취를 위해 hash 테이블을 가지고 있으면 모든 hash에 대한 값을 유추할 수 있으므로 보안에 취약해져 salt 같은 값으로 변형을 주는 것임
+
 ## 고차 함수로 try/except 공통화해서 코드 간결화하기
 ```
 from utils.py import makeTryExcept 
