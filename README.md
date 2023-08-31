@@ -1,5 +1,47 @@
 # django-tips
 
+## Django + Mongodb 기반의 BackEnd 환경에서 테스트 DB 구축
+### 조건   
+- 운영 DB 이외에 테스트 DB가 필요함
+- 두 DB 간의 스위칭은 자동으로 이루어져야 함 (실수 방지 목적)
+- 운영 서버에서는 운영 DB에 접속하고 테스트 서버에서는 테스트 DB에 접속해야 함
+
+### 환경
+- BackEnd: Elasticbeans Talk + Django
+- DB: Mongodb Atlas
+
+### 방법
+- Mongodb Atlas에서 테스트 DB용 프로젝트 생성
+- 이는 운영 DB와 테스트 DB 간에 상호 영향없게 하기 위함
+- 테스트 DB는 Mongodb Atlas의 무료 모드로 사용
+- 운영 DB의 콜렉션과 데이터를 export 해서 테스트 DB에 import
+
+### settings.py
+- Django 의 settings.py 변경
+- Elasticbeans talk에 반영된 운영 서버는 AWS_EXECUTION_ENV 값을 가지고 있고 이 값이 있으면 운영 DB 바라봄
+- 이외에는 테스트 DB 바라봄
+```
+# settings.py
+
+import os
+
+if os.environ.get('AWS_EXECUTION_ENV'):
+    selected_host = MONGODB_HOST_FILE
+else:
+    selected_host = MONGODB_TEST_HOST_FILE
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'db',
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': selected_host,
+        },
+    }
+}
+```
+
 ## Django 패스워드(PBKDF2PasswordHasher) 생성 로직
 ### 패스워드 생성
 ```
