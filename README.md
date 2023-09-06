@@ -1,5 +1,30 @@
 # django-tips
 
+## ALLOWED_HOSTS의 의미
+### 정의
+- Django의 settings.py에 ALLOWED_HOSTS 를 등록할 수 있음
+- 어디서 오는지 막는 기능이 아님 (referer 체크와 다름)
+- django가 실행될 수 있는 서버의 도메인이나 ip를 지정하는 것임
+  
+### HTTP Host Header Attack 에 대한 방어 기능 수행
+```
+1) Django 가 www.api.com 이라는 도메인에서 동작
+2) 해커가 http header의 host 값을 악의적인 사이트로 변조함 ⇒ www.hacker.com
+3) 어떤 동작을 수행할 때 www.hacker.com으로 넘김
+4) ALLOWED_HOSTS에 www.api.com 만 등록되어 있으면 다른 도메인으로의 동작을 차단할 수 있음
+```
+
+### 등록 예제
+```
+# frontend: front.server.com
+# backend (django): www.api.com
+# front.server.com을 등록하는 것이 아님
+# django가 실행되는 도메인을 기록해야 함
+
+# settings.py
+ALLOWED_HOSTS = ['www.api.com']
+```
+
 ## Django + Mongodb 기반의 BackEnd 환경에서 테스트 DB 구축
 ### 조건   
 - 운영 DB 이외에 테스트 DB가 필요함
