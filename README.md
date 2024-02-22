@@ -1,5 +1,58 @@
 # django-tips
 
+## Put, Delete Method 처리 방법두 가지
+### decorator 로 처리하는 방법
+- csrf 토큰 관련 오류가 나서 csrf_exempt 처리해 줘야 함
+```
+# urls.py
+urlpatterns = [
+    path('test/', TestView.as_view()),
+]
+```
+```
+# views.py
+from rest_framework.views import APIView
+from django.http import HttpResponse
+from rest_framework.decorators import action
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+
+@method_decorator(csrf_exempt, name = 'dispatch')
+class TestLogicView(APIView):
+     @action(detail=True, methods=['delete'])
+         def delete(self, request, slug):
+            result = 'ok'
+            return HttpResponse(result, status=200)
+    
+     @action(detail=True, methods=['put'])
+         def put(self, request, slug):
+            result = 'ok'
+            return HttpResponse(result, status=200)
+```
+
+### APIView에 pk/slug 담아서 처리하는 방법
+- Django의 APIView에서 pub, delete 메서드 이용할 때 해당 리소스의 고유 식별자(pk 또는 slug)를 보내야 함
+```
+# urls.py
+urlpatterns = [
+    path('test/<str:slug>', TestView.as_view()),
+]
+```
+```
+# views.py
+from rest_framework.views import APIView
+from django.http import HttpResponse
+
+class TestLogicView(APIView):
+    def delete(self, request, slug):
+        result = 'ok'
+        return HttpResponse(result, status=200)
+
+    def put(self, request, slug):
+        result = 'ok'
+        return HttpResponse(result, status=200)
+``` 
+
 ## ALLOWED_HOSTS의 의미
 ### 정의
 - Django의 settings.py에 ALLOWED_HOSTS 를 등록할 수 있음
