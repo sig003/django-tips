@@ -1,5 +1,61 @@
 # django-tips
 
+## Pymongo에서 Mongodb  join(lookup) 시 콜렉션 명 지정 
+###결과값 안 나오는 코드
+- 아래와 같이 지정 시 결과값이 안 나옴
+```
+import pymongo
+from django.views.generic import View
+
+client = pymongo.MongoClient('mongodb+srv://<value>/?retryWrites=true&w=majority', tz_aware=True)
+dbname = client['test_db']
+MainCollection = dbname['main']
+SubCollection = dbname['sub']
+
+class TestView(View):
+	def get(self, request):
+		pipeline = [
+				{
+	                            '$lookup': {
+	                                'from': 'SubCollection',
+	                                'localField': 'id',
+	                                'foreignField': 'id',
+	                                'as': 'result'
+	                            }
+	                        }
+			]
+		result = list(MainCollection.aggregate(pipeline))
+```
+
+### 원인
+- $lookup.from 에 dbname의 변수로 할당된 SubCollection을 쓰면 안 되고 콜렉션명을 직접 명시해야 함
+
+### 해결
+
+```
+import pymongo
+from django.views.generic import View
+
+client = pymongo.MongoClient('mongodb+srv://<value>/?retryWrites=true&w=majority', tz_aware=True)
+dbname = client['test_db']
+MainCollection = dbname['main']
+SubCollection = dbname['sub']
+
+class TestView(View):
+	def get(self, request):
+		pipeline = [
+				{
+	                            '$lookup': {
+	                                'from': 'sub',  #DB의 콜렉션명으로 교체
+	                                'localField': 'id',
+	                                'foreignField': 'id',
+	                                'as': 'result'
+	                            }
+	                        }
+			]
+		result = list(MainCollection.aggregate(pipeline))
+```
+
 ## Put, Delete Method 처리 방법두 가지
 ### decorator 로 처리하는 방법
 - csrf 토큰 관련 오류가 나서 csrf_exempt 처리해 줘야 함
